@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Images</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="body1">
+    <div class="imgContainer">
+        <h1>All Images from Server</h1>
+        <div class="images"></div>
+        <div class="noimages"></div>
+    </div>
+</body>
+<script>
+    const getImages = async()=>{
+        let response = await fetch("http://localhost:8080/images")
+        let responseJson = await response.json();
+        if(responseJson.length == 0){
+            document.getElementsByClassName("images")[0].style.display = "none"
+            let nodata =  document.getElementsByClassName("noimages")[0];
+            nodata.innerHTML = "<h1>No Data Available</h1>";
+        }
+        else{
+            responseJson.map(item=>{
+                let div = document.createElement("div");
+                div.className = "imgbg";
+                let imageTag = document.createElement("img");
+                imageTag.src = item.img;
+                imageTag.style.width = "100%";
+                div.append(imageTag)
+                document.getElementsByClassName("images")[0].append(div)
+            })
+        }
+    }
+    getImages();
+</script>
+</html>

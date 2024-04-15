@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="body">
+    <div class="container">
+        <p class="title" >Lets Upload Image</p> <br/>
+        <span class="inpSpan">Choose File</span><input type="file" id="impImg" accept="image/*" onchange="uploadImage(event)"><br/>
+        <div class="msg"></div><br/>
+        <div class="btn"><button id="btn" onclick="handleSubmit()">Upload</button></div>
+        <a target="_blank" href="./Images.html">Click here for Images</a>
+    </div>
+</body>
+<script>   
+    let btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.style.opacity = "0.3"
+    var base64Img = "";
+
+    const imagebase64 = async(file)=>{
+        const reader = new FileReader()
+        await reader.readAsDataURL(file)
+        const data = new Promise((resolve,reject)=>{
+            reader.onload = ()=>resolve(reader.result)
+            reader.onerror = (err)=>reject(err)
+        })
+        return data;
+    }
+
+    const uploadImage = async(e)=>{
+        const file = e.target.files[0]
+        document.getElementsByClassName("msg")[0].innerHTML = `${file.name}`;
+        console.log(file.name);
+        const image = await imagebase64(file)
+        base64Img = image
+        let btn = document.getElementById("btn");
+        btn.disabled = false;
+        btn.style.opacity = "1"
+    }
+
+    const handleSubmit = async()=>{
+        event.preventDefault();
+        if(base64Img){
+            try{
+                let response = await fetch("http://localhost:8080/uploadimg",{
+                method:"POST",
+                headers:{
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({img:base64Img})
+                })
+                let responseJson = await response.json();
+                alert(responseJson.msg);
+            }
+            catch(err){
+                console.log(err)
+            }
+
+        }
+        window.location.reload();
+    }
+
+</script>
+</html>
